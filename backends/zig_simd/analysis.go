@@ -1,6 +1,6 @@
 package zig_simd
 
-import "github.com/efren-garza-z/Zenith-AI/core"
+import "github.com/efren-garza-z/zenith-ai/core"
 
 // CenterOfMass representa el punto medio de los píxeles detectados
 type CenterOfMass struct {

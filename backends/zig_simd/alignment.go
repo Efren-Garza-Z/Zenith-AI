@@ -1,7 +1,7 @@
 package zig_simd
 
 import (
-	"github.com/efren-garza-z/Zenith-AI/core"
+	"github.com/efren-garza-z/zenith-ai/core"
 )
 
 // CenterSignature desplaza los píxeles para que el Centro de Masa esté en el centro exacto del tensor

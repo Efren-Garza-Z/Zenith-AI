@@ -1,7 +1,7 @@
 package zig_simd
 
 import (
-	"github.com/efren-garza-z/Zenith-AI/core"
+	"github.com/efren-garza-z/zenith-ai/core"
 )
 
 // CompareSignatures realiza una comparación de solapamiento de píxeles (Índice de Jaccard simplificado).

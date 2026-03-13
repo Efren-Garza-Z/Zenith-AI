@@ -12,7 +12,7 @@ import "C"
 import (
 	"unsafe"
 
-	"github.com/efren-garza-z/Zenith-AI/core"
+	"github.com/efren-garza-z/zenith-ai/core"
 )
 
 // ConvolveWithZig usa el motor de Zig optimizado con instrucciones SIMD

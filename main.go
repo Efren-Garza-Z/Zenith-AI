@@ -1,8 +1,8 @@
 //package main
 //
 //import (
-//	"github.com/efren-garza-z/Zenith-AI/backends/zig_simd"
-//	"github.com/efren-garza-z/Zenith-AI/core"
+//	"github.com/efren-garza-z/zenith-ai/backends/zig_simd"
+//	"github.com/efren-garza-z/zenith-ai/core"
 //	"fmt"
 //	"os"
 //	"path/filepath"
@@ -99,8 +99,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/efren-garza-z/Zenith-AI/backends/zig_simd"
-	"github.com/efren-garza-z/Zenith-AI/core"
+	"github.com/efren-garza-z/zenith-ai/backends/zig_simd"
+	"github.com/efren-garza-z/zenith-ai/core"
 )
 
 func main() {
