@@ -6,81 +6,86 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv" // Para convertir texto a número
 	"strings"
 	"time"
 )
 
 func main() {
-	// 1. Validar que el usuario pasó una ruta
+	// 1. Validar argumentos (Ruta obligatoria, Umbral opcional)
 	if len(os.Args) < 2 {
-		fmt.Println("❌ Uso: ./ZenithEngine.exe <ruta_archivo_o_carpeta>")
+		fmt.Println("❌ Uso: ./ZenithEngine.exe <archivo_o_carpeta> [umbral: 0.0-1.0]")
+		fmt.Println("Ejemplo: ./ZenithEngine.exe firma.jpg 0.25")
 		return
 	}
 
 	targetPath := os.Args[1]
+
+	// 2. Definir umbral (por defecto 0.2 si el usuario no pone nada)
+	thresholdValue := 0.2
+	if len(os.Args) >= 3 {
+		parsed, err := strconv.ParseFloat(os.Args[2], 64)
+		if err == nil && parsed >= 0 && parsed <= 1 {
+			thresholdValue = parsed
+		} else {
+			fmt.Println("⚠️  Umbral inválido. Usando valor por defecto: 0.2")
+		}
+	}
+
 	info, err := os.Stat(targetPath)
 	if err != nil {
-		fmt.Printf("❌ Error: No se pudo encontrar la ruta: %v\n", err)
+		fmt.Printf("❌ Error: Ruta no encontrada: %v\n", err)
 		return
 	}
 
-	// 2. Crear carpeta de salida si no existe
 	outputDir := "zenith_results"
 	os.MkdirAll(outputDir, os.ModePerm)
 
-	// 3. Decidir si procesar uno o muchos
+	fmt.Printf("🚀 Zenith-AI | Umbral configurado: %.2f\n", thresholdValue)
+
 	if info.IsDir() {
-		fmt.Printf("📂 Procesando carpeta: %s\n", targetPath)
-		processDirectory(targetPath, outputDir)
+		processDirectory(targetPath, outputDir, thresholdValue)
 	} else {
-		processSingleFile(targetPath, outputDir)
+		processSingleFile(targetPath, outputDir, thresholdValue)
 	}
 }
 
-func processSingleFile(path, outDir string) {
-	// Filtrar extensiones válidas
+func processSingleFile(path, outDir string, threshold float64) {
 	ext := strings.ToLower(filepath.Ext(path))
 	if ext != ".jpg" && ext != ".jpeg" && ext != ".png" && ext != ".webp" {
 		return
 	}
 
-	fmt.Printf("📸 Procesando: %s... ", filepath.Base(path))
-
 	input, err := core.LoadImageToTensor(path)
 	if err != nil {
-		fmt.Printf("Error al cargar: %v\n", err)
+		fmt.Printf("❌ Error al cargar %s: %v\n", path, err)
 		return
 	}
 
-	// --- PIPELINE ---
+	// PIPELINE
 	clean := zig_simd.GaussianBlur(input)
 	edges := zig_simd.ConvolveWithZig(clean, zig_simd.SobelX)
-	final := zig_simd.Threshold(edges, 0.2)
-	// ----------------
+	final := zig_simd.Threshold(edges, threshold) // Usamos el valor dinámico
 
-	// Análisis
 	pct := zig_simd.GetActivePixelPercentage(final)
 
-	// Guardar con nombre prefijado en la carpeta de salida
 	newName := "proc_" + filepath.Base(path)
 	outputPath := filepath.Join(outDir, newName)
 	core.SaveTensorToImage(outputPath, final)
 
-	fmt.Printf("Done! (Contenido: %.2f%%) -> %s\n", pct, outputPath)
+	fmt.Printf("📸 %-20s | Contenido: %6.2f%% | Salida: %s\n", filepath.Base(path), pct, newName)
 }
 
-func processDirectory(dirPath, outDir string) {
+func processDirectory(dirPath, outDir string, threshold float64) {
 	files, _ := os.ReadDir(dirPath)
 	start := time.Now()
 	count := 0
 
 	for _, f := range files {
 		if !f.IsDir() {
-			fullPath := filepath.Join(dirPath, f.Name())
-			processSingleFile(fullPath, outDir)
+			processSingleFile(filepath.Join(dirPath, f.Name()), outDir, threshold)
 			count++
 		}
 	}
-
-	fmt.Printf("\n✨ Finalizado. %d imágenes procesadas en %s\n", count, time.Since(start))
+	fmt.Printf("\n✨ Finalizado. %d archivos procesados en %s\n", count, time.Since(start))
 }
