@@ -1,4 +1,4 @@
-module Zenith-AI
+module github.com/efren-garza-z/Zenith-AI
 
 go 1.26
 

@@ -10,8 +10,9 @@ void zig_threshold(double* input, double* output, int h, int w, double threshold
 */
 import "C"
 import (
-	"Zenith-AI/core"
 	"unsafe"
+
+	"github.com/efren-garza-z/Zenith-AI/core"
 )
 
 // ConvolveWithZig usa el motor de Zig optimizado con instrucciones SIMD
