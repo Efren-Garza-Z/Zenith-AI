@@ -14,12 +14,12 @@ Zenith-AI es un motor de pre-procesamiento de imágenes de alto rendimiento dise
 
 ---
 
-## 🛠️ Requisitos
+## 🛠️ Requisitos del Sistema
 
-Para compilar y ejecutar este motor, necesitas:
+Esta librería utiliza **CGO** y **Zig** para alcanzar un rendimiento superior mediante instrucciones SIMD. Para usarla, el sistema debe tener instalado:
 
-1. **Go** (v1.18 o superior)
-2. **Zig** (v0.10 o superior) — Actúa como compilador de C y motor nativo.
+1. **Zig Compiler (v0.11.0 o superior):** [Descargar aquí](https://ziglang.org/download/).
+2. **Go (v1.20 o superior).**
 3. **Librerías de Go:**
 ```bash
 go get golang.org/x/image/webp
@@ -35,26 +35,41 @@ go get golang.org/x/image/webp
 
 ---
 
-## 🏗️ Guía de Compilación
+## 🏗️ Instalación y Configuración Nativa
 
-Sigue estos pasos en orden para generar el binario optimizado:
+Debido a que Go no compila código Zig automáticamente, debes generar el binario nativo antes de compilar tu proyecto:
 
-### 1. Compilar el Motor Nativo (Zig)
-
-Desde la carpeta `backends/zig_simd/`:
-```powershell
-zig build-lib conv.zig -target x86_64-windows-gnu -O ReleaseFast -mcpu=native
-# Mover y renombrar para Go
-mv conv.lib ../../libconv.a
+### 1. Descargar la librería
+```bash
+go get github.com/efren-garza-z/Zenith-AI
 ```
 
-### 2. Compilar el Binario Final (Go)
+### 2. Compilar el Motor Nativo (Zig)
 
-Desde la raíz del proyecto:
+Navega a la carpeta donde se instaló la librería (o dentro de tu `vendor`) y ejecuta:
+```bash
+cd backends/zig_simd
+zig build-lib conv.zig -O ReleaseFast -mcpu=native
+
+# Windows:
+mv conv.lib ../../libconv.a
+
+# Linux/macOS:
+mv libconv.a ../../
+```
+
+### 3. Compilar tu Proyecto
+
+Para compilar cualquier aplicación que use esta librería, debes indicar a Go que use Zig como compilador de C:
 ```powershell
+# Windows (PowerShell)
 $env:CGO_ENABLED="1"
 $env:CC="zig cc -target x86_64-windows-gnu"
-go build -o ZenithEngine.exe main.go
+go build .
+```
+```bash
+# Linux/macOS
+CGO_ENABLED=1 CC="zig cc" go build .
 ```
 
 ---
