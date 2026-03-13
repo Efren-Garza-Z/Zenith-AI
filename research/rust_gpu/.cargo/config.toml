@@ -1,0 +1,3 @@
+[target.x86_64-pc-windows-gnu]
+linker = "zig"
+rustflags = ["-C", "link-arg=cc", "-C", "link-arg=-target", "-C", "link-arg=x86_64-windows-gnu"]
